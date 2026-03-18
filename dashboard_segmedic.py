@@ -174,7 +174,17 @@ if len(d) == 0:
             <p>Monitoramento de atendimentos, faturamento e perfil de pacientes</p>
         </div>
     """, unsafe_allow_html=True)
-    st.warning("⚠️ Nenhum dado encontrado para os filtros selecionados. Ajuste os filtros na barra lateral.")
+    st.markdown("""
+        <div style='background:#fef9c3;border:2px solid #fde047;border-radius:12px;
+                    padding:20px 24px;margin-top:20px;'>
+            <div style='font-size:1.1rem;font-weight:700;color:#854d0e;margin-bottom:6px;'>
+                ⚠️ Nenhum dado encontrado para os filtros selecionados.
+            </div>
+            <div style='font-size:0.9rem;color:#92400e;'>
+                Ajuste os filtros na barra lateral para visualizar os dados.
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
     st.stop()
 
 # ── CABEÇALHO ─────────────────────────────────────────────────
@@ -330,10 +340,21 @@ col1, col2 = st.columns([1, 2])
 with col1:
     dist_sexo = d.groupby('sexo').size().reset_index(name='qtd')
     cores_sexo = [('#3b82f6' if s == 'Masculino' else '#f472b6') for s in dist_sexo['sexo']]
+
+    # Mostro o número absoluto de pacientes de cada sexo junto com o percentual
+    custom_labels = [
+        f"{row['sexo']}<br><b>{row['qtd']:,}</b> pacientes"
+        for _, row in dist_sexo.iterrows()
+    ]
+
     fig = go.Figure(go.Pie(
-        labels=dist_sexo['sexo'], values=dist_sexo['qtd'], hole=0.5,
+        labels=dist_sexo['sexo'],
+        values=dist_sexo['qtd'],
+        hole=0.5,
         marker=dict(colors=cores_sexo, line=dict(color='white', width=3)),
-        textinfo='label+percent', textfont=dict(size=12),
+        text=custom_labels,
+        textinfo='text+percent',
+        textfont=dict(size=11),
         hovertemplate='<b>%{label}</b><br>%{value:,} atendimentos<br>%{percent}<extra></extra>'
     ))
     base_layout(fig, 'Atendimentos por Sexo', 340)
@@ -361,14 +382,49 @@ st.plotly_chart(
     use_container_width=True, config=PC
 )
 
-# Info — Média de atendimentos por paciente
+# Destaque para a média de atendimentos por paciente
 media_atend_paciente = d.groupby('id_paciente').size().mean() if total_atendimentos > 0 else 0
-st.markdown(
-    f'<div class="info-box">'
-    f'📌 Média de atendimentos por paciente: <strong>{media_atend_paciente:.1f}</strong>'
-    f'&nbsp;&nbsp;|&nbsp;&nbsp;Pacientes únicos: <strong>{pacientes_unicos:,}</strong></div>',
-    unsafe_allow_html=True
-)
+col_m1, col_m2, col_m3 = st.columns(3)
+with col_m1:
+    st.markdown(f"""
+        <div style='background:#fff;border-radius:12px;padding:20px 22px;
+                    border:1px solid #e2e8f0;border-top:3px solid #3b82f6;
+                    box-shadow:0 1px 3px rgba(0,0,0,0.05);text-align:center;'>
+            <div style='font-size:0.7rem;color:#94a3b8;font-weight:600;
+                        text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;'>
+                📊 Média de Atendimentos por Paciente
+            </div>
+            <div style='font-size:2rem;font-weight:700;color:#1e293b;'>{media_atend_paciente:.1f}</div>
+            <div style='font-size:0.78rem;color:#64748b;margin-top:4px;'>atendimentos/paciente</div>
+        </div>
+    """, unsafe_allow_html=True)
+with col_m2:
+    st.markdown(f"""
+        <div style='background:#fff;border-radius:12px;padding:20px 22px;
+                    border:1px solid #e2e8f0;border-top:3px solid #10b981;
+                    box-shadow:0 1px 3px rgba(0,0,0,0.05);text-align:center;'>
+            <div style='font-size:0.7rem;color:#94a3b8;font-weight:600;
+                        text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;'>
+                👥 Pacientes Únicos
+            </div>
+            <div style='font-size:2rem;font-weight:700;color:#1e293b;'>{pacientes_unicos:,}</div>
+            <div style='font-size:0.78rem;color:#64748b;margin-top:4px;'>pacientes no período</div>
+        </div>
+    """, unsafe_allow_html=True)
+with col_m3:
+    max_atend = int(d.groupby('id_paciente').size().max()) if total_atendimentos > 0 else 0
+    st.markdown(f"""
+        <div style='background:#fff;border-radius:12px;padding:20px 22px;
+                    border:1px solid #e2e8f0;border-top:3px solid #8b5cf6;
+                    box-shadow:0 1px 3px rgba(0,0,0,0.05);text-align:center;'>
+            <div style='font-size:0.7rem;color:#94a3b8;font-weight:600;
+                        text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;'>
+                🏆 Maior Frequência
+            </div>
+            <div style='font-size:2rem;font-weight:700;color:#1e293b;'>{max_atend}</div>
+            <div style='font-size:0.78rem;color:#64748b;margin-top:4px;'>atendimentos (1 paciente)</div>
+        </div>
+    """, unsafe_allow_html=True)
 
 # ============================================================
 # SEÇÃO 4 — Operação da Clínica
