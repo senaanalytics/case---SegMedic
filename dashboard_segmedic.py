@@ -158,7 +158,7 @@ with st.sidebar:
             st.markdown(f"<div style='background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:6px 10px;font-size:0.78rem;color:#1d4ed8;margin-bottom:6px;'>{a}</div>", unsafe_allow_html=True)
     else:
         st.caption("Nenhum filtro ativo")
-    st.markdown("<div style='font-size:0.7rem;color:#cbd5e1;text-align:center;margin-top:16px;'>SegMedic Analytics</div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size:0.7rem;color:#cbd5e1;text-align:center;margin-top:16px;'>SegMedic - Case: Isaque Sena</div>", unsafe_allow_html=True)
 
 # ── Aplicar filtros ───────────────────────────────────────────
 d = df.copy()
